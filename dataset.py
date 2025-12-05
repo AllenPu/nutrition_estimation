@@ -108,8 +108,10 @@ class nutrition5k(data.Dataset):
         for e in img_path_list:
             transformed_img = transform(e)
             img.append(transformed_img)
-        label = float(self.label_dict[key])
-        # return a list [overhead, cam A, cam B, cam C, cam D] or [cam A, cam B, cam C, cam D] 
+        label = np.asarray(self.label_dict[key].astype('float32'))
+        # now we have a list [overhead, cam A, cam B, cam C, cam D] or [cam A, cam B, cam C, cam D] 
+        # then we can concat them together
+        img = torch.cat
         return img, label
         
 ##################
