@@ -53,6 +53,8 @@ class nutrition5k(data.Dataset):
                     dish = row.split(',')
                     dish_id, dish_calo = dish[0], dish[1]
                     self.label_dict[dish_id] = dish_calo
+        #
+        self.cameras = ["camera_A_frame_", "camera_B_frame_", "camera_C_frame_", "camera_D_frame_"]
 
     #
     def __len__(self):
@@ -82,17 +84,32 @@ class nutrition5k(data.Dataset):
         index = index % len(self.image_path.keys())
         key = list(self.image_path.keys())[index]
         ##########
-        img_list = []
+        img_path_list, img = [], []
         # check the first item is the overhead path, the next item is sides path
         # length 1, only sides, length 2, both overhead and sides
         if len(self.image_path[key]) == 2:
             overhead_path = self.image_path[0]
             overhead_img = Image.open(self.image_path[key]).convert('RGB')
+            img_path_list.append(overhead_img)
+        #if len(self.image_path[key]) == 1:
+        sides_path = self.image_path[-1]
+        sides_path = os.path.join(sides_path, 'frames')
         # 
-        img = Image.open(self.image_path[key]).convert('RGB')
+        for e in self.cameras:
+            # from 30 different sides choice 1 random
+            for c in range(num_choice):
+                indexs = random.choice(30)
+                cam_path = os.path.join(sides_path, e)
+                cam_path = os.path.join(cam_path, indexs)
+                side_img = Image.open(self.image_path[key]).convert('RGB')
+                img_path_list.append(side_img)
+        # 
         transform = self.get_transform()
-        img = transform(img)
+        for e in img_path_list:
+            transformed_img = transform(e)
+            img.append(transformed_img)
         label = float(self.label_dict[key])
+        # return a list [overhead, cam A, cam B, cam C, cam D] or [cam A, cam B, cam C, cam D] 
         return img, label
         
 ##################
