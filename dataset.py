@@ -3,9 +3,11 @@ import os
 from torch.utils import data
 import csv
 from PIL import Image
+import numpy as np
 
 
 class nutrition5k(data.Dataset):
+    # angles: overhead, camera_A, camera_B, camera_C, camera_D
     def _init__(self, split='train', angles='overhead'):
         train_path = '/data/rpu2/nutrition5k/nutrition5k_dataset/dish_ids/splits/rgb_train_ids.txt'
         test_path = '/data/rpu2/nutrition5k/nutrition5k_dataset/dish_ids/splits/rgb_test_ids.txt'
@@ -18,6 +20,7 @@ class nutrition5k(data.Dataset):
         if split == 'test':
             paths = test_path
         #
+        self.removal_angle = angles
         self.image_path, self.label_dict = [], {}
         #
         img_list = [os.path.join(imagery_path, 'realsense_overhead'), os.path.join(imagery_path, 'side_angles')]
@@ -54,7 +57,9 @@ class nutrition5k(data.Dataset):
                     dish_id, dish_calo = dish[0], dish[1]
                     self.label_dict[dish_id] = dish_calo
         #
-        self.cameras = ["camera_A_frame_", "camera_B_frame_", "camera_C_frame_", "camera_D_frame_"]
+        if sl
+        cameras = ["camera_A_frame_", "camera_B_frame_", "camera_C_frame_", "camera_D_frame_"]
+        self.camera = cameras.remove(f'{self.removal_angle}_frame_')
 
     #
     def __len__(self):
@@ -106,12 +111,12 @@ class nutrition5k(data.Dataset):
         # 
         transform = self.get_transform()
         for e in img_path_list:
-            transformed_img = transform(e)
+            transformed_img = np.array(transform(e))
             img.append(transformed_img)
         label = np.asarray(self.label_dict[key].astype('float32'))
         # now we have a list [overhead, cam A, cam B, cam C, cam D] or [cam A, cam B, cam C, cam D] 
         # then we can concat them together
-        img = torch.cat
+        img = np.concatenate(img, axis=0)
         return img, label
         
 ##################
