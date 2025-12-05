@@ -85,16 +85,18 @@ class nutrition5k(data.Dataset):
 
     # num_choice : how many image you want to chosse from each angle (sides)
     def __getitem__(self, index, num_choice = 5):
+        transform = self.get_transform()
         index = index % len(self.image_path.keys())
         key = list(self.image_path.keys())[index]
         ##########
-        img_path_list, img = [], []
+        imgs = []
         # check the first item is the overhead path, the next item is sides path
         # length 1, only sides, length 2, both overhead and sides
         if len(self.image_path[key]) == 2:
             overhead_path = self.image_path[0]
             overhead_img = Image.open(self.image_path[key]).convert('RGB')
-            img_path_list.append(overhead_img)
+            img = np.array(transform(overhead_img))
+            imgs.append(np.expand_dims(img, axis=0))
         #if len(self.image_path[key]) == 1:
         sides_path = self.image_path[-1]
         sides_path = os.path.join(sides_path, 'frames')
@@ -107,28 +109,25 @@ class nutrition5k(data.Dataset):
             num_choice = 10
         #
         for e in angles:
+            img_list = []
             # from 30 different sides choice 1 random
             for c in range(num_choice):
                 indexs = random.choice(30)
                 cam_path = os.path.join(sides_path, e)
                 cam_path = os.path.join(cam_path, indexs)
                 side_img = Image.open(self.image_path[key]).convert('RGB')
-                img_path_list.append(side_img)
-        
+                img_list.append(np.array(transform(e)))
+            img = np.stack(arr_list, axis=0)
+            imgs.append(img)
         # 
-        transform = self.get_transform()
-        for e in img_path_list:
-            transformed_img = np.array(transform(e))
-            img.append(transformed_img)
         label = np.asarray(self.label_dict[key].astype('float32'))
         # now we have a list [overhead, cam A, cam B, cam C, cam D] or [cam A, cam B, cam C, cam D] 
-        # then we can concat them together
-        img = np.concatenate(img, axis=0)
-        return img, label
+        # then we can concat them together    
+        return imgs, label
         
 ##################
 #
-# img output sequence : overhead, camera_A, camera_B, camera_C, camera_D
+# img output sequence :  tensor : [[overhead, camera_A, camera_B, camera_C, camera_D]], N x [cam A, ..., cam D]
 #
 ##################
 
