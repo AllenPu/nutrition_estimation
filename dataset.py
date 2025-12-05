@@ -57,7 +57,6 @@ class nutrition5k(data.Dataset):
                     dish_id, dish_calo = dish[0], dish[1]
                     self.label_dict[dish_id] = dish_calo
         #
-        if sl
         cameras = ["camera_A_frame_", "camera_B_frame_", "camera_C_frame_", "camera_D_frame_"]
         self.camera = cameras.remove(f'{self.removal_angle}_frame_')
 
@@ -85,7 +84,7 @@ class nutrition5k(data.Dataset):
         return transform
 
     # num_choice : how many image you want to chosse from each angle (sides)
-    def __getitem__(self, index, num_choice = 1):
+    def __getitem__(self, index, num_choice = 5):
         index = index % len(self.image_path.keys())
         key = list(self.image_path.keys())[index]
         ##########
@@ -100,7 +99,14 @@ class nutrition5k(data.Dataset):
         sides_path = self.image_path[-1]
         sides_path = os.path.join(sides_path, 'frames')
         # 
-        for e in self.cameras:
+        if self.split == 'train':
+            angles = self.camera
+            num_choice = num_choice
+        elif self.split == 'test':
+            angles = [f'{self.removal_angle}_frame_']
+            num_choice = 10
+        #
+        for e in angles:
             # from 30 different sides choice 1 random
             for c in range(num_choice):
                 indexs = random.choice(30)
@@ -108,6 +114,7 @@ class nutrition5k(data.Dataset):
                 cam_path = os.path.join(cam_path, indexs)
                 side_img = Image.open(self.image_path[key]).convert('RGB')
                 img_path_list.append(side_img)
+        
         # 
         transform = self.get_transform()
         for e in img_path_list:
