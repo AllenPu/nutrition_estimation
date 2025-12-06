@@ -91,14 +91,7 @@ class nutrition5k(data.Dataset):
         key = list(self.image_path.keys())[index]
         ##########
         imgs = []
-        # check the first item is the overhead path, the next item is sides path
-        # length 1, only sides, length 2, both overhead and sides
-        #if len(self.image_path[key]) == 2:
-        #    overhead_path = self.image_path[0]
-        #    overhead_img = Image.open(self.image_path[key]).convert('RGB')
-        #    img = np.array(transform(overhead_img))
-        #    imgs.append(np.expand_dims(img, axis=0))
-        #if len(self.image_path[key]) == 1:
+        # 
         sides_path = self.image_path[key]
         sides_path = os.path.join(sides_path, 'frames')
         #
@@ -141,8 +134,7 @@ class nutrition5k_overhead(data.Dataset):
                 #
                 img_overhead = os.path.join(img_list[0], row)
                 if os.path.exists(img_overhead):
-                    img_list.append(img_overhead)
-                self.image_path[row] = img_list
+                    self.image_path[row] = img_list
         print(f'The length of this set is {len(self.image_path)}')
         # process the label directory
         for e in label_list:
@@ -185,7 +177,7 @@ class nutrition5k_overhead(data.Dataset):
         # check the first item is the overhead path, the next item is sides path
         # length 1, only sides, length 2, both overhead and sides
         #if len(self.image_path[key]) == 2:
-        overhead_path = self.image_path[0]
+        overhead_path = self.image_path[key]
         overhead_img = Image.open(self.image_path[key]).convert('RGB')
         img = np.array(transform(overhead_img))
         imgs.append(np.expand_dims(img, axis=0))
