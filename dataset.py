@@ -127,5 +127,72 @@ class nutrition5k(data.Dataset):
 
 
 
-    
+class nutrition5k_overhead(data.Dataset):
+    # angles: overhead
+    def _init__(self, split='train', angles='amera_A'): 
+        overhead_path = os.path.join(imagery_path, 'realsense_overhead')
+        label_list = [os.path.join(label_path, 'dish_metadata_cafe1.csv'), os.path.join(label_path, 'dish_metadata_cafe2.csv')]
+        with open(paths, mode='r', encoding='utf-8', newline='') as f:
+            reader = csv.DictReader(f)
+            img_list = []
+            for row in reader:
+                if 'dish' not in row:
+                    continue
+                #
+                img_overhead = os.path.join(img_list[0], row)
+                if os.path.exists(img_overhead):
+                    img_list.append(img_overhead)
+                self.image_path[row] = img_list
+        print(f'The length of this set is {len(self.image_path)}')
+        # process the label directory
+        for e in label_list:
+            with open(e, mode='r', encoding='utf-8', newline='') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    dish = row.split(',')
+                    dish_id, dish_calo = dish[0], dish[1]
+                    self.label_dict[dish_id] = dish_calo
+        
+     def __len__(self):
+        return len(self.image_path.keys())
+
+
+    #
+    def get_transform(self):
+        if self.split == 'train':
+            transform = transforms.Compose([
+                transforms.Resize((self.img_size, self.img_size)),
+                transforms.RandomCrop(self.img_size, padding=16),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize([.5, .5, .5], [.5, .5, .5]),
+            ])
+        else:
+            transform = transforms.Compose([
+                transforms.Resize((self.img_size, self.img_size)),
+                transforms.ToTensor(),
+                transforms.Normalize([.5, .5, .5], [.5, .5, .5]),
+            ])
+        return transform
+
+    # num_choice : how many image you want to chosse from each angle (sides)
+    def __getitem__(self, index, num_choice = 5):
+        transform = self.get_transform()
+        index = index % len(self.image_path.keys())
+        key = list(self.image_path.keys())[index]
+        ##########
+        imgs = []
+        # check the first item is the overhead path, the next item is sides path
+        # length 1, only sides, length 2, both overhead and sides
+        #if len(self.image_path[key]) == 2:
+        overhead_path = self.image_path[0]
+        overhead_img = Image.open(self.image_path[key]).convert('RGB')
+        img = np.array(transform(overhead_img))
+        imgs.append(np.expand_dims(img, axis=0))
+        label = np.asarray(self.label_dict[key].astype('float32'))
+        # now we have a list [cam A, cam B, cam C, cam D] or [cam A, cam B, cam C, cam D] 
+        # then we can concat them together    
+        return imgs, label
+        
+
 
