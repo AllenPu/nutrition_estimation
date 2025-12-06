@@ -8,7 +8,7 @@ import numpy as np
 
 class nutrition5k(data.Dataset):
     # angles: overhead, camera_A, camera_B, camera_C, camera_D
-    def _init__(self, split='train', angles='overhead'):
+    def _init__(self, split='train', angles='amera_A'):
         train_path = '/data/rpu2/nutrition5k/nutrition5k_dataset/dish_ids/splits/rgb_train_ids.txt'
         test_path = '/data/rpu2/nutrition5k/nutrition5k_dataset/dish_ids/splits/rgb_test_ids.txt'
         #
@@ -23,7 +23,7 @@ class nutrition5k(data.Dataset):
         self.removal_angle = angles
         self.image_path, self.label_dict = [], {}
         #
-        img_list = [os.path.join(imagery_path, 'realsense_overhead'), os.path.join(imagery_path, 'side_angles')]
+        #img_list = [os.path.join(imagery_path, 'realsense_overhead'), os.path.join(imagery_path, 'side_angles')]
         label_list = [os.path.join(label_path, 'dish_metadata_cafe1.csv'), os.path.join(label_path, 'dish_metadata_cafe2.csv')]
         #
         #if angles == 'overhead':
@@ -38,11 +38,12 @@ class nutrition5k(data.Dataset):
                 if 'dish' not in row:
                     continue
                 #
-                img_overhead = os.path.join(img_list[0], row)
-                img_sides = os.path.join(img_list[1], row)    
+                #img_overhead = os.path.join(img_list[0], row)
+                #if os.path.exists(img_overhead):
+                #    img_list.append(img_overhead)
+                img_upper_path = os.path.join(imagery_path, 'side_angles')
+                img_sides = os.path.join(img_upper_path, row)    
                 #
-                if os.path.exists(img_overhead):
-                    img_list.append(img_overhead)
                 if os.path.exists(img_sides):
                     img_list.append(img_sides)
                     # this path is the upper directory of the dish_id, not 
@@ -92,21 +93,14 @@ class nutrition5k(data.Dataset):
         imgs = []
         # check the first item is the overhead path, the next item is sides path
         # length 1, only sides, length 2, both overhead and sides
-        if len(self.image_path[key]) == 2:
-            overhead_path = self.image_path[0]
-            overhead_img = Image.open(self.image_path[key]).convert('RGB')
-            img = np.array(transform(overhead_img))
-            imgs.append(np.expand_dims(img, axis=0))
+        #if len(self.image_path[key]) == 2:
+        #    overhead_path = self.image_path[0]
+        #    overhead_img = Image.open(self.image_path[key]).convert('RGB')
+        #    img = np.array(transform(overhead_img))
+        #    imgs.append(np.expand_dims(img, axis=0))
         #if len(self.image_path[key]) == 1:
-        sides_path = self.image_path[-1]
+        sides_path = self.image_path[key]
         sides_path = os.path.join(sides_path, 'frames')
-        # 
-        if self.split == 'train':
-            angles = self.camera
-            num_choice = num_choice
-        elif self.split == 'test':
-            angles = [f'{self.removal_angle}_frame_']
-            num_choice = 10
         #
         for e in angles:
             img_list = []
@@ -121,13 +115,13 @@ class nutrition5k(data.Dataset):
             imgs.append(img)
         # 
         label = np.asarray(self.label_dict[key].astype('float32'))
-        # now we have a list [overhead, cam A, cam B, cam C, cam D] or [cam A, cam B, cam C, cam D] 
+        # now we have a list [cam A, cam B, cam C, cam D] or [cam A, cam B, cam C, cam D] 
         # then we can concat them together    
         return imgs, label
         
 ##################
 #
-# img output sequence :  tensor : [[overhead, camera_A, camera_B, camera_C, camera_D]], N x [cam A, ..., cam D]
+# img output sequence :  tensor : [[camera_A, camera_B, camera_C, camera_D]], N x [cam A, ..., cam D]
 #
 ##################
 
