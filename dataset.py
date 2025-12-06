@@ -59,7 +59,8 @@ class nutrition5k(data.Dataset):
                     self.label_dict[dish_id] = dish_calo
         #
         cameras = ["camera_A_frame_", "camera_B_frame_", "camera_C_frame_", "camera_D_frame_"]
-        self.camera = cameras.remove(f'{self.removal_angle}_frame_')
+        if angels != '':
+            self.camera = cameras.remove(f'{self.removal_angle}_frame_')
 
     #
     def __len__(self):
