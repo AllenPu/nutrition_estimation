@@ -25,12 +25,7 @@ class nutrition5k_sides(data.Dataset):
         #
         #img_list = [os.path.join(imagery_path, 'realsense_overhead'), os.path.join(imagery_path, 'side_angles')]
         label_list = [os.path.join(label_path, 'dish_metadata_cafe1.csv'), os.path.join(label_path, 'dish_metadata_cafe2.csv')]
-        #
-        #if angles == 'overhead':
-        #    position = '/realsense_overhead'
-        #else:
-        #    position = '/side_angles'
-        # process the image directory
+       #
         with open(paths, mode='r', encoding='utf-8', newline='') as f:
             reader = csv.DictReader(f)
             img_list = []
