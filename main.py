@@ -11,11 +11,10 @@ if __name__ == "__main__":
     #build up model
     model = Regression()
     #set up dataset
-    train_dataset = nutrition5k(angles='')
+    train_dataset = nutrition5k_overhead()
     train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True,num_workers=8, pin_memory=True, drop_last=False)
-    test_dataset = nutrition5k(split='test')
+    test_dataset = nutrition5k_overhead(split='test')
     test_loader = DataLoader(test_dataset, batch_size=128, shuffle=True,num_workers=8, pin_memory=True, drop_last=False)
     #
-    for idx, (x, y) in enmurate(train_loader):
-        y_pred, z = model(x)
+    
         # shape of N, camA, camB, camC, camD
