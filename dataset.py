@@ -93,14 +93,14 @@ class nutrition5k_sides(data.Dataset):
         #
         for e in self.camera:
             img_list = []
-            # from 30 different sides choice 1 random
-            for c in range(num_choice):
-                indexs = random.choice(30).zfill(3)
-                cam_path = os.path.join(sides_path, e) + indexs + '.jpeg'
-                side_img = Image.open(cam_path).convert('RGB')
-                img_list.append(np.array(transform(e)))
-            img = np.stack(arr_list, axis=0)
-            imgs.append(img)
+            # from 30 different sides choice 1 random, now we only choice 1 random img
+            #for c in range(num_choice):
+            indexs = random.choice(30).zfill(3)
+            cam_path = os.path.join(sides_path, e) + indexs + '.jpeg'
+            side_img = Image.open(cam_path).convert('RGB')
+            side_img = np.array(transform(e))
+            #img = np.stack(arr_list, axis=0)
+            imgs.append(side_img)
         # 
         label = np.asarray(self.label_dict[key].astype('float32'))
         # now we have a list [cam A, cam B, cam C, cam D] or [cam A, cam B, cam C, cam D] 
