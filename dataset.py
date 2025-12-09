@@ -95,8 +95,8 @@ class nutrition5k_sides(data.Dataset):
             img_list = []
             # from 30 different sides choice 1 random
             for c in range(num_choice):
-                indexs = random.choice(30)
-                cam_path = os.path.join(sides_path, e) + '0' + indexs + '.jpeg'
+                indexs = random.choice(30).zfill(3)
+                cam_path = os.path.join(sides_path, e) + indexs + '.jpeg'
                 side_img = Image.open(cam_path).convert('RGB')
                 img_list.append(np.array(transform(e)))
             img = np.stack(arr_list, axis=0)
@@ -195,8 +195,8 @@ class nutrition5k_overhead(data.Dataset):
         sides_path = os.path.join(self.image_path[key][1], 'frames')
         #
         for a in self.camera:
-            indexs = random.choice(30)
-            sides_img = os.path.join(sides_path, a) + '0' + indexes + '.jpeg'
+            indexs = random.choice(30).zfill(3)
+            sides_img = os.path.join(sides_path, a) + indexes + '.jpeg'
             sides_img = Image.open(sides_img).convert('RGB')
             sides_img = np.array(transform(side_img))
             imgs.append(sides_img)
