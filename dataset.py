@@ -204,6 +204,7 @@ class nutrition5k_overhead(data.Dataset):
         label = np.asarray(self.label_dict[key].astype('float32'))
         # now we have a list [cam A, cam B, cam C, cam D] or [cam A, cam B, cam C, cam D] 
         # then we can concat them together    
+        #return a list of tensors : [overall, sideA, sideB, sideC, sideD]
         return imgs, label
 
 
