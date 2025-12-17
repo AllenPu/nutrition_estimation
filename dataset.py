@@ -24,6 +24,7 @@ class nutrition5k_sides(data.Dataset):
         #
         self.removal_angle = angles
         self.image_path, self.label_dict = [], {}
+        self.img_size = 224
         #
         #img_list = [os.path.join(imagery_path, 'realsense_overhead'), os.path.join(imagery_path, 'side_angles')]
         label_list = [os.path.join(label_path, 'dish_metadata_cafe1.csv'), os.path.join(label_path, 'dish_metadata_cafe2.csv')]
@@ -129,6 +130,7 @@ class nutrition5k_overhead(data.Dataset):
             paths = train_path
         if split == 'test':
             paths = test_path
+        self.img_size = 224
         overhead_path = os.path.join(imagery_path, 'realsense_overhead')
         angles_path = os.path.join(imagery_path, 'side_angles')
         imagery_path = '/data/rpu2/nutrition5k/nutrition5k_dataset/imagery'
@@ -147,7 +149,7 @@ class nutrition5k_overhead(data.Dataset):
                 else:
                     continue
 
-        print(f'The length of this set is {len(self.image_path)}')
+        #print(f'The length of this set is {len(self.image_path)}')
         # process the label directory
         for e in label_list:
             with open(e, mode='r', encoding='utf-8', newline='') as f:
