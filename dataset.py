@@ -4,6 +4,8 @@ from torch.utils import data
 import csv
 from PIL import Image
 import numpy as np
+import random
+from torchvision.transforms import transforms
 
 # only return the side images
 class nutrition5k_sides(data.Dataset):
@@ -54,7 +56,7 @@ class nutrition5k_sides(data.Dataset):
                     self.label_dict[dish_id] = dish_calo
         #
         cameras = ["camera_A_frame_", "camera_B_frame_", "camera_C_frame_", "camera_D_frame_"]
-        if angels != '':
+        if self.removal_angle  != '':
             self.camera = cameras.remove(f'{self.removal_angle}_frame_')
 
     #
@@ -120,12 +122,15 @@ class nutrition5k_overhead(data.Dataset):
     def _init__(self, split='train'): 
         train_path = '/data/rpu2/nutrition5k/nutrition5k_dataset/dish_ids/splits/rgb_train_ids.txt'
         test_path = '/data/rpu2/nutrition5k/nutrition5k_dataset/dish_ids/splits/rgb_test_ids.txt'
+        imagery_path = '/data/rpu2/nutrition5k/nutrition5k_dataset/imagery'
+        # dish_id, total_calories, total_mass, total_fat, total_carb, total_protein, num_ingrs
+        label_path = '/data/rpu2/nutrition5k/nutrition5k_dataset/metadata'
         if split == 'train':
             paths = train_path
         if split == 'test':
             paths = test_path
         overhead_path = os.path.join(imagery_path, 'realsense_overhead')
-        angles_path = os.path.join(imagery, 'side_angles')
+        angles_path = os.path.join(imagery_path, 'side_angles')
         imagery_path = '/data/rpu2/nutrition5k/nutrition5k_dataset/imagery'
         label_list = [os.path.join(label_path, 'dish_metadata_cafe1.csv'), os.path.join(label_path, 'dish_metadata_cafe2.csv')]
         with open(paths, mode='r', encoding='utf-8', newline='') as f:
@@ -136,7 +141,7 @@ class nutrition5k_overhead(data.Dataset):
                     continue
                 #
                 img_overhead = os.path.join(overhead_path, row)
-                img_side_angles = os.path.join(side_angles, row)
+                img_side_angles = os.path.join(angles_path, row)
                 if os.path.exists(img_overhead) and os.path.exists(img_side_angles):
                     self.image_path[row] = [img_overhead, img_side_angles]
                 else:
@@ -154,7 +159,7 @@ class nutrition5k_overhead(data.Dataset):
         #
         self.cameras = ["camera_A_frame_", "camera_B_frame_", "camera_C_frame_", "camera_D_frame_"]
         
-     def __len__(self):
+    def __len__(self):
         return len(self.image_path.keys())
 
 
@@ -196,9 +201,9 @@ class nutrition5k_overhead(data.Dataset):
         #
         for a in self.camera:
             indexs = random.choice(30).zfill(3)
-            sides_img = os.path.join(sides_path, a) + indexes + '.jpeg'
+            sides_img = os.path.join(sides_path, a) + indexs + '.jpeg'
             sides_img = Image.open(sides_img).convert('RGB')
-            sides_img = np.array(transform(side_img))
+            sides_img = np.array(transform(sides_img))
             imgs.append(sides_img)
         #imgs.append(np.expand_dims(img, axis=0))
         label = np.asarray(self.label_dict[key].astype('float32'))
