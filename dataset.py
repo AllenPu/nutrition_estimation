@@ -160,7 +160,7 @@ class nutrition5k_overhead(data.Dataset):
         self.cameras = ["camera_A_frame_", "camera_B_frame_", "camera_C_frame_", "camera_D_frame_"]
         
     def __len__(self):
-        return len(self.image_path.keys())
+        return len(self.image_path.keys()) 
 
 
     #
